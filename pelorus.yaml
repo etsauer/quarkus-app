@@ -1,0 +1,34 @@
+---
+apiVersion: charts.pelorus.dora-metrics.io/v1alpha1
+kind: Pelorus
+metadata:
+  name: pelorus-sample
+  namespace: pelorus
+spec:
+  federate_openshift_monitoring:
+    enabled: false
+  exporters:
+    instances:
+      - enabled: true
+        app_name: deploytime-exporter
+        exporter_type: deploytime
+      - enabled: false
+        app_name: failuretime-exporter
+        exporter_type: failure
+      - enabled: true
+        app_name: committime-exporter
+        exporter_type: committime
+        extraEnv:
+        - name: PROVIDER
+          value: containerimage
+      - enabled: true
+        app_name: webhook-exporter
+        exporter_type: webhook
+    global: {}
+  openshift_prometheus_basic_auth_pass: changeme
+  openshift_prometheus_htpasswd_auth: 'internal:{SHA}+pvrmeQCmtWmYVOZ57uuITVghrM='
+  prometheus_retention: 1y
+  prometheus_retention_size: 1GB
+  prometheus_storage: false
+  prometheus_storage_pvc_capacity: 2Gi
+  prometheus_storage_pvc_storageclass: gp2
