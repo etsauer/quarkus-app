@@ -1,4 +1,4 @@
-# quarkus-app Pelorus reproducer
+# Pelorus API Prototype
 
 This project is a sample quarkus app made for generating data in a Pelorus setup.
 
