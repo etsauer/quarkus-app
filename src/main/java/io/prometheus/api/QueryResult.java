@@ -4,5 +4,6 @@ import java.util.List;
 
 public record QueryResult (
     Metric metric,
-    List<Value> values
+    List<Value> values,
+    Value value
 ) {}

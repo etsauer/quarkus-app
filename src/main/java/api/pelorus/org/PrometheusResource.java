@@ -30,6 +30,14 @@ public class PrometheusResource {
     }
 
     @GET
+    @Path("/deployment_frequency")
+    @Produces(MediaType.APPLICATION_JSON)
+    public HTTPQueryResult querySDPApplications(@QueryParam("range") String range) {
+        HTTPQueryResult results = queryService.runQuery(String.format("count (count_over_time (deploy_timestamp [%s]))", range));
+        return results;
+    }
+
+    @GET
     @Path("/json")
     @Produces(MediaType.APPLICATION_JSON)
     public JsonNode queryJson(@QueryParam("query") String query) {
