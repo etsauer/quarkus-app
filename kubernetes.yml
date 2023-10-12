@@ -1,4 +1,24 @@
 ---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: pelorus-api
+  namespace: quarkus-app
+  labels:
+    app.kubernetes.io/managed-by: quarkus
+    app.kubernetes.io/name: quarkus-app
+    app.kubernetes.io/version: 1.0.0-SNAPSHOT
+spec:
+  to:
+    kind: Service
+    name: quarkus-app
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: ''
+    destinationCACertificate: ''
+  port:
+    targetPort: http
+---
 apiVersion: v1
 kind: Service
 metadata:
