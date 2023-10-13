@@ -14,6 +14,7 @@ oc apply -f pelorus.yaml
 
 ```
 oc apply -f kubernetes.yaml
+oc adm policy add-cluster-role-to-user cluster-reader system:serviceaccount:pelorus-api:default
 ```
 ## Packaging and redeploying the application
 

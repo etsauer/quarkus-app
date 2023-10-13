@@ -6,11 +6,16 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.prometheus.api.App;
 import io.prometheus.api.HTTPQueryResult;
+import io.prometheus.api.QueryResult;
 import io.prometheus.api.QueryService;
 
 @Path("/sdp")
@@ -33,9 +38,14 @@ public class SoftwareDeliveryPerformanceApi {
     @GET
     @Path("/apps")
     @Produces(MediaType.APPLICATION_JSON)
-    public HTTPQueryResult getApps(@QueryParam("range") String range) {
+    public List<App> getApps(@QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(APPS_LIST, range));
-        return results;
+        List<App> list = new ArrayList<App>();
+        for (QueryResult qr: results.data().result()) {
+            App app = new App(qr.metric().app);
+            list.add(app);
+        }
+        return list;
     }
 
 
