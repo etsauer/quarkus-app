@@ -12,9 +12,19 @@ spec:
       - enabled: true
         app_name: deploytime-exporter
         exporter_type: deploytime
-      - enabled: false
-        app_name: failuretime-exporter
+      - app_name: github-failure-exporter
         exporter_type: failure
+        env_from_secrets:
+        - github-pat
+        extraEnv:
+          - name: PROVIDER
+            value: github
+          - name: APP_LABEL
+            value: enhancement
+          - name: PROJECTS
+            value: etsauer/pelorus-api
+          - name: GITHUB_ISSUE_LABEL
+            value: enhancement
       - enabled: true
         app_name: committime-exporter
         exporter_type: committime
