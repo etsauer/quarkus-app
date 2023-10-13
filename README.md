@@ -10,7 +10,12 @@ Install the Pelorus operator via OperatorHub/OLM, and then apply the following P
 oc apply -f pelorus.yaml
 ```
 
-## Packaging and running the application
+## Deploy the application
+
+```
+oc apply -f kubernetes.yaml
+```
+## Packaging and redeploying the application
 
 The application can be packaged using:
 
@@ -24,8 +29,6 @@ The build also produces a container image tagged with the snapshot version. In o
 podman push quay.io/etsauer/quarkus-app:1.0.0-SNAPSHOT
 ```
 
-## Run the application
-
 ```
-oc apply -f kubernetes.yaml
+oc rollout restart deployment/pelorus-api
 ```

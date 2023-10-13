@@ -1,6 +1,7 @@
 package io.prometheus.api;
 
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
+import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,7 +12,7 @@ import jakarta.ws.rs.QueryParam;
 
 @Path("/query")
 @RegisterRestClient(configKey = "prometheus-api")
-@ClientHeaderParam(name = "Authorization", value = "Bearer ${bearer.token}")
+@RegisterClientHeaders(BearerTokenClientHeaderFactory.class)
 public interface QueryService {
     
     @GET
