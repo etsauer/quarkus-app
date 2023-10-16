@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.prometheus.api.App;
 import io.prometheus.api.HTTPQueryResult;
+import io.prometheus.api.LeadTime;
 import io.prometheus.api.QueryResult;
 import io.prometheus.api.QueryService;
 
@@ -60,9 +61,9 @@ public class SoftwareDeliveryPerformanceApi {
     @GET
     @Path("/lead_time_for_change/{app}")
     @Produces(MediaType.APPLICATION_JSON)
-    public HTTPQueryResult queryLeadTimeforChangeByApp(String app, @QueryParam("range") String range) {
+    public LeadTime queryLeadTimeforChangeByApp(String app, @QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(LEAD_TIME_FOR_CHANGE_BY_APP, app, range));
-        return results;
+        return new LeadTime(results.data().result().get(0).value().value());
     }
 
 

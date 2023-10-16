@@ -78,6 +78,8 @@ spec:
           value: /var/run/secrets/kubernetes.io/serviceaccount/token
         - name: PELORUS_URL
           value: "https://prometheus-pelorus.pelorus.svc:9091/api/v1"
+        - name: JAVA_OPTS
+          value: "-Djavax.net.ssl.trustStore=/var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt -Dquarkus.log.category.\"javax.net.ssl\".level=DEBUG"
         image: quay.io/etsauer/quarkus-app:1.0.0-SNAPSHOT
         imagePullPolicy: Always
         name: pelorus-api
