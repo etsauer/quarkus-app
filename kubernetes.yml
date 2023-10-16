@@ -74,6 +74,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: AUTH_TOKEN
+          value: /var/run/secrets/kubernetes.io/serviceaccount/token
+        - name: PELORUS_URL
+          value: "https://prometheus-pelorus.pelorus.svc:9091/api/v1"
         image: quay.io/etsauer/quarkus-app:1.0.0-SNAPSHOT
         imagePullPolicy: Always
         name: pelorus-api
