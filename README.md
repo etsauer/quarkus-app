@@ -21,7 +21,7 @@ oc adm policy add-cluster-role-to-user cluster-reader system:serviceaccount:pelo
 The application can be packaged using:
 
 ```
-./mvnw package -Dnative -Dquarkus.native.container-build=true -Dcommit.id="$(git rev-parse HEAD)" -Dcommit.date="$(git log -1 --format='%ad' --date='format:%a %b %d %H:%M:%S %Y %z')"
+./mvnw package -Dnative -Dquarkus.native.container-build=true -Dcommit.id="$(git rev-parse HEAD)" -Dcommit.date="$(git log -1 --format='%ad' --date='format:%a %b %d %H:%M:%S %Y %z')" -Dorigin.url="$(git config --get remote.origin.url)"
 ```
 
 The build also produces a container image tagged with the snapshot version. In order to deploy the image, re-tag it for your repository, and then push it to a registry:
@@ -32,4 +32,33 @@ podman push quay.io/etsauer/quarkus-app:1.0.0-SNAPSHOT
 
 ```
 oc rollout restart deployment/pelorus-api
+```
+
+## Dev Spaces live dev mode
+
+```bash
+cat << EOF | oc apply -f -
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pelorus-api
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+EOF
+```
+
+```bash
+oc adm policy add-cluster-role-to-user pelorus-api <Your-DevSpaces-User>
+```
+
+```bash
+oc whoami -t > /tmp/token
+export AUTH_TOKEN=/tmp/token
+export PELORUS_URL=https://prometheus-pelorus.pelorus.svc:9091/api/v1
+quarkus dev -Dquarkus.tls.trust-all=true -Dquarkus.http.host=0.0.0.0
 ```
