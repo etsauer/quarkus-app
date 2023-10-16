@@ -36,25 +36,22 @@ oc rollout restart deployment/pelorus-api
 
 ## Dev Spaces live dev mode
 
+
+Create appropriate permissions for the pelorus-api deployment to talk to the Pelorus Prometheus instance.
+
+It requires `get` on `namespace`
+
 ```bash
-cat << EOF | oc apply -f -
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: pelorus-api
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - namespaces
-  verbs:
-  - get
-EOF
+oc apply -f pelorus-api-cluster-role.yaml
 ```
+
+Bind the cluster role to the user or service account that will be running the pelorus-api app
 
 ```bash
 oc adm policy add-cluster-role-to-user pelorus-api <Your-DevSpaces-User>
 ```
+
+Run the app in a Dev Spaces terminal:
 
 ```bash
 oc whoami -t > /tmp/token
