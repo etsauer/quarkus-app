@@ -30,6 +30,7 @@ public class SoftwareDeliveryPerformanceApi {
         ) by (app)
         """;
     private final String LEAD_TIME_FOR_CHANGE = "avg_over_time(sdp:lead_time:global [%s])";
+    private final String LEAD_TIME_FOR_CHANGE_BY_APP = "avg_over_time(sdp:lead_time:by_app{app=~'.*%s.*'}[%s])";
     private final String DEPLOYMENT_FREQUENCY = "count (count_over_time (deploy_timestamp [%s]))";
 
     @RestClient
@@ -48,15 +49,6 @@ public class SoftwareDeliveryPerformanceApi {
         return list;
     }
 
-
-    @GET
-    @Path("/sdp_application")
-    @Produces(MediaType.APPLICATION_JSON)
-    public HTTPQueryResult querySDPApplications() {
-        HTTPQueryResult results = queryService.runQuery("sdp:applications[2d]");
-        return results;
-    }
-
     @GET
     @Path("/lead_time_for_change")
     @Produces(MediaType.APPLICATION_JSON)
@@ -64,6 +56,15 @@ public class SoftwareDeliveryPerformanceApi {
         HTTPQueryResult results = queryService.runQuery(String.format(LEAD_TIME_FOR_CHANGE, range));
         return results;
     }
+
+    @GET
+    @Path("/lead_time_for_change/{app}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public HTTPQueryResult queryLeadTimeforChangeByApp(String app, @QueryParam("range") String range) {
+        HTTPQueryResult results = queryService.runQuery(String.format(LEAD_TIME_FOR_CHANGE_BY_APP, app, range));
+        return results;
+    }
+
 
     @GET
     @Path("/deployment_frequency")
