@@ -14,6 +14,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.prometheus.api.App;
+import io.prometheus.api.DeploymentFrequency;
 import io.prometheus.api.HTTPQueryResult;
 import io.prometheus.api.LeadTime;
 import io.prometheus.api.QueryResult;
@@ -33,6 +34,7 @@ public class SoftwareDeliveryPerformanceApi {
     private final String LEAD_TIME_FOR_CHANGE = "avg_over_time(sdp:lead_time:global [%s])";
     private final String LEAD_TIME_FOR_CHANGE_BY_APP = "avg_over_time(sdp:lead_time:by_app{app=~'.*%s.*'}[%s])";
     private final String DEPLOYMENT_FREQUENCY = "count (count_over_time (deploy_timestamp [%s]))";
+    private final String DEPLOYMENT_FREQUENCY_BY_APP = "count (count_over_time (deploy_timestamp{app=~'.*%s.*'}[%s]))";
 
     @RestClient
     QueryService queryService;
@@ -73,6 +75,14 @@ public class SoftwareDeliveryPerformanceApi {
     public HTTPQueryResult queryDeploymentFrequency(@QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(DEPLOYMENT_FREQUENCY, range));
         return results;
+    }
+
+    @GET
+    @Path("/deployment_frequency/{app}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public DeploymentFrequency queryDeploymentFrequencyByApp(String app, @QueryParam("range") String range) {
+        HTTPQueryResult results = queryService.runQuery(String.format(DEPLOYMENT_FREQUENCY_BY_APP, app, range));
+        return new DeploymentFrequency(results.data().result().get(0).value().value());
     }
 
     @GET
