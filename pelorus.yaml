@@ -19,8 +19,6 @@ spec:
         extraEnv:
           - name: PROVIDER
             value: github
-          - name: APP_LABEL
-            value: enhancement
           - name: PROJECTS
             value: etsauer/pelorus-api
           - name: GITHUB_ISSUE_LABEL
