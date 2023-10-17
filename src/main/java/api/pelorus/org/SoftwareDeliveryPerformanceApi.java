@@ -14,6 +14,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.prometheus.api.App;
+import io.prometheus.api.ChangeFailureRate;
 import io.prometheus.api.DeploymentFrequency;
 import io.prometheus.api.HTTPQueryResult;
 import io.prometheus.api.LeadTime;
@@ -35,6 +36,9 @@ public class SoftwareDeliveryPerformanceApi {
     private final String LEAD_TIME_FOR_CHANGE_BY_APP = "avg_over_time(sdp:lead_time:by_app{app=~'.*%s.*'}[%s])";
     private final String DEPLOYMENT_FREQUENCY = "count (count_over_time (deploy_timestamp [%s]))";
     private final String DEPLOYMENT_FREQUENCY_BY_APP = "count (count_over_time (deploy_timestamp{app=~'.*%s.*'}[%s]))";
+    private final String CHANGE_FAILURE_RATE = "(count by (app) (count_over_time(failure_creation_timestamp{app!=\"unknown\"}[%1$s]) or sdp:lead_time:by_app * 0) / count_over_time(sdp:lead_time:by_app [%1$s]))";
+    private final String CHANGE_FAILURE_RATE_BY_APP = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s])) or sdp:lead_time:by_app * 0) / sum(count_over_time(sdp:lead_time:by_app{app=~\".*%1$s.*\"} [%2$s]))";
+
 
     @RestClient
     QueryService queryService;
@@ -83,6 +87,14 @@ public class SoftwareDeliveryPerformanceApi {
     public DeploymentFrequency queryDeploymentFrequencyByApp(String app, @QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(DEPLOYMENT_FREQUENCY_BY_APP, app, range));
         return new DeploymentFrequency(results.data().result().get(0).value().value());
+    }
+
+    @GET
+    @Path("/change_failure_rate/{app}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ChangeFailureRate queryChangeFailureRateByApp(String app, @QueryParam("range") String range) {
+        HTTPQueryResult results = queryService.runQuery(String.format(CHANGE_FAILURE_RATE_BY_APP, app, range));
+        return new ChangeFailureRate(results.data().result().get(0).value().value());
     }
 
     @GET
