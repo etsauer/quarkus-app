@@ -51,7 +51,7 @@ public class SoftwareDeliveryPerformanceApi {
         HTTPQueryResult results = queryService.runQuery(String.format(APPS_LIST, range));
         List<App> list = new ArrayList<App>();
         for (QueryResult qr: results.data().result()) {
-            App app = new App(qr.metric().app);
+            App app = new App(qr.metric().app.replace("/", ""));
             list.add(app);
         }
         return list;
