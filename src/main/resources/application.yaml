@@ -1,0 +1,43 @@
+quarkus:
+  http:
+    cors:
+      ~: true
+      origins: ${CORS_ORIGINS}
+      methods: ${CORS_METHODS}
+      headers: "Content-Type, Accept, X-Requested-With, remember-me"
+      access-control-max-age: "3600"
+      access-control-allow-credentials: true
+  log:
+    level: "INFO"
+    console:
+      enable: true
+    category:
+      "org.jboss.resteasy.reactive.client.logging":
+        level: DEBUG
+      key:
+        level: FATAL
+  rest-client:
+    prometheus-api:
+      url: ${PELORUS_URL}
+      scope: "jakarta.inject.Singleton"
+    logging:
+      scope: request-response
+      body-limit: 1024
+  tls:
+    trust-all: true
+  kubernetes:
+    idempotent: true
+    deployment-target: openshift
+  container-image:
+    build: true
+    registry: quay.io
+    group: etsauer
+    push: false
+    labels:
+      "io.openshift.build.commit.id": ${commit.id}
+      "io.openshift.build.commit.date": ${commit.date}
+      "io.openshift.build.source-location": ${origin.url}
+bearer:
+  token:
+    path: ${AUTH_TOKEN}
+
