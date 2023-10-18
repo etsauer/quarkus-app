@@ -18,6 +18,7 @@ import io.prometheus.api.ChangeFailureRate;
 import io.prometheus.api.DeploymentFrequency;
 import io.prometheus.api.HTTPQueryResult;
 import io.prometheus.api.LeadTime;
+import io.prometheus.api.LeadTimeData;
 import io.prometheus.api.MeanTimeToRestore;
 import io.prometheus.api.QueryResult;
 import io.prometheus.api.QueryService;
@@ -35,6 +36,9 @@ public class SoftwareDeliveryPerformanceApi {
         """;
     private final String LEAD_TIME_FOR_CHANGE = "avg_over_time(sdp:lead_time:global [%s])";
     private final String LEAD_TIME_FOR_CHANGE_BY_APP = "avg_over_time(sdp:lead_time:by_app{app=~'.*%s.*'}[%s])";
+    // It should be this, once https://github.com/dora-metrics/pelorus/issues/1088 gets resolved
+    // private final String LEAD_TIME_FOR_CHANGE_BY_APP_DATA = "sdp:lead_time:by_commit{app=~'.*%s.*'}[%s]";
+    private final String LEAD_TIME_FOR_CHANGE_BY_APP_DATA = "(min_over_time(deploy_timestamp{app=~\".*%1$s.*\"}[%2$s]) - on(app,image_sha) group_left(commit) (max by (app, commit, image_sha) (max_over_time(commit_timestamp{app=~\".*%1$s.*\"}[%2$s]))))";
     private final String DEPLOYMENT_FREQUENCY = "count (count_over_time (deploy_timestamp [%s]))";
     private final String DEPLOYMENT_FREQUENCY_BY_APP = "count (count_over_time (deploy_timestamp{app=~'.*%s.*'}[%s]))";
     private final String MEAN_TIME_TO_RESTORE_BY_APP = "avg(avg_over_time(sdp:time_to_restore:by_app{app=~\".*%s.*\"}[%s]))";
@@ -73,6 +77,19 @@ public class SoftwareDeliveryPerformanceApi {
         return new LeadTime(results.data().result().get(0).value().value());
     }
 
+    @GET
+    @Path("/lead_time_for_change/{app}/data")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<LeadTimeData> queryLeadTimeforChangeDataByApp(String app, @QueryParam("range") String range) {
+        HTTPQueryResult results = queryService.runQuery(String.format(LEAD_TIME_FOR_CHANGE_BY_APP_DATA, app, range));
+        List<LeadTimeData> leadTimeData= new ArrayList<LeadTimeData>();
+        for (QueryResult qr: results.data().result()) {
+            LeadTimeData data = new LeadTimeData(qr.metric().commit, qr.metric().image_sha, qr.value().timestamp(), qr.value().value());
+            leadTimeData.add(data);
+        }
+        return leadTimeData;
+    }
+    
     @GET
     @Path("/deployment_frequency")
     @Produces(MediaType.APPLICATION_JSON)
