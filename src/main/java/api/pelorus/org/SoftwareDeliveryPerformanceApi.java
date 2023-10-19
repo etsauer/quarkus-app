@@ -16,12 +16,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.prometheus.api.App;
 import io.prometheus.api.ChangeFailureRate;
 import io.prometheus.api.DeploymentFrequency;
+import io.prometheus.api.DeploymentFrequencyData;
 import io.prometheus.api.HTTPQueryResult;
 import io.prometheus.api.LeadTime;
 import io.prometheus.api.LeadTimeData;
 import io.prometheus.api.MeanTimeToRestore;
 import io.prometheus.api.QueryResult;
 import io.prometheus.api.QueryService;
+import io.prometheus.api.Value;
 
 @Path("/sdp")
 public class SoftwareDeliveryPerformanceApi {
@@ -41,6 +43,7 @@ public class SoftwareDeliveryPerformanceApi {
     // private final String LEAD_TIME_FOR_CHANGE_BY_APP_DATA = "(min_over_time(deploy_timestamp{app=~\".*%1$s.*\"}[%2$s]) - on(app,image_sha) group_left(commit) (max by (app, commit, image_sha) (max_over_time(commit_timestamp{app=~\".*%1$s.*\"}[%2$s]))))";
     private final String DEPLOYMENT_FREQUENCY = "count (count_over_time (deploy_timestamp [%s]))";
     private final String DEPLOYMENT_FREQUENCY_BY_APP = "count (count_over_time (deploy_timestamp{app=~'.*%s.*'}[%s]))";
+    private final String DEPLOYMENT_FREQUENCY_BY_APP_DATA = "deploy_timestamp{app=~'.*%s.*'}[%s]";
     private final String MEAN_TIME_TO_RESTORE_BY_APP = "avg(avg_over_time(sdp:time_to_restore:by_app{app=~\".*%s.*\"}[%s]))";
     private final String CHANGE_FAILURE_RATE = "(count by (app) (count_over_time(failure_creation_timestamp{app!=\"unknown\"}[%1$s]) or sdp:lead_time:by_app * 0) / count_over_time(sdp:lead_time:by_app [%1$s]))";
     private final String CHANGE_FAILURE_RATE_BY_APP = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s])) or sdp:lead_time:by_app * 0) / sum(count_over_time(sdp:lead_time:by_app{app=~\".*%1$s.*\"} [%2$s]))";
@@ -104,6 +107,23 @@ public class SoftwareDeliveryPerformanceApi {
     public DeploymentFrequency queryDeploymentFrequencyByApp(String app, @QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(DEPLOYMENT_FREQUENCY_BY_APP, app, range));
         return new DeploymentFrequency(results.data().result().get(0).value().value());
+    }
+
+    @GET
+    @Path("/deployment_frequency/{app}/data")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<DeploymentFrequencyData> queryDeploymentFrequencyDataByApp(String app, @QueryParam("range") String range) {
+        HTTPQueryResult results = queryService.runQuery(String.format(DEPLOYMENT_FREQUENCY_BY_APP_DATA, app, range));
+        List<DeploymentFrequencyData> deployFreqData= new ArrayList<DeploymentFrequencyData>();
+        for (QueryResult qr: results.data().result()) {
+            List<Value> lv = new ArrayList<Value>();
+            for (Value v: qr.values()) {
+                lv.add(v);
+            }
+            DeploymentFrequencyData data = new DeploymentFrequencyData(qr.metric().image_sha, lv);
+            deployFreqData.add(data);
+        }
+        return deployFreqData;
     }
 
     @GET
