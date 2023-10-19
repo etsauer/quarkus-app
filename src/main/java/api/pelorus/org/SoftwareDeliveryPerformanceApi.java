@@ -7,6 +7,8 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -116,11 +118,14 @@ public class SoftwareDeliveryPerformanceApi {
         HTTPQueryResult results = queryService.runQuery(String.format(DEPLOYMENT_FREQUENCY_BY_APP_DATA, app, range));
         List<DeploymentFrequencyData> deployFreqData= new ArrayList<DeploymentFrequencyData>();
         for (QueryResult qr: results.data().result()) {
-            List<Value> lv = new ArrayList<Value>();
-            for (Value v: qr.values()) {
-                lv.add(v);
-            }
-            DeploymentFrequencyData data = new DeploymentFrequencyData(qr.metric().image_sha, lv);
+            List<Value> lv = qr.values();
+            Collections.sort(lv, new Comparator<Value>() {
+                @Override
+                public int compare(Value v1, Value v2) {
+                  return v1.timestamp().compareTo(v2.timestamp());
+                }
+            });
+            DeploymentFrequencyData data = new DeploymentFrequencyData(qr.metric().image_sha, lv.get(0).timestamp());
             deployFreqData.add(data);
         }
         return deployFreqData;
