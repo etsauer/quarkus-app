@@ -119,12 +119,14 @@ public class SoftwareDeliveryPerformanceApi {
         List<DeploymentFrequencyData> deployFreqData= new ArrayList<DeploymentFrequencyData>();
         for (QueryResult qr: results.data().result()) {
             List<Value> lv = qr.values();
+            // Sort the deploy_timestamp metrics so that the earliest one is at the top of the list
             Collections.sort(lv, new Comparator<Value>() {
                 @Override
                 public int compare(Value v1, Value v2) {
                   return v1.timestamp().compareTo(v2.timestamp());
                 }
             });
+            // return only the first occurence of a deployment for a given image_sha
             DeploymentFrequencyData data = new DeploymentFrequencyData(qr.metric().image_sha, lv.get(0).timestamp());
             deployFreqData.add(data);
         }
