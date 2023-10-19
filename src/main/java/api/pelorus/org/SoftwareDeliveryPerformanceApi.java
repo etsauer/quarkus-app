@@ -23,6 +23,7 @@ import io.prometheus.api.HTTPQueryResult;
 import io.prometheus.api.LeadTime;
 import io.prometheus.api.LeadTimeData;
 import io.prometheus.api.MeanTimeToRestore;
+import io.prometheus.api.MeanTimeToRestoreData;
 import io.prometheus.api.QueryResult;
 import io.prometheus.api.QueryService;
 import io.prometheus.api.Value;
@@ -47,6 +48,7 @@ public class SoftwareDeliveryPerformanceApi {
     private final String DEPLOYMENT_FREQUENCY_BY_APP = "count (count_over_time (deploy_timestamp{app=~'.*%s.*'}[%s]))";
     private final String DEPLOYMENT_FREQUENCY_BY_APP_DATA = "deploy_timestamp{app=~'.*%s.*'}[%s]";
     private final String MEAN_TIME_TO_RESTORE_BY_APP = "avg(avg_over_time(sdp:time_to_restore:by_app{app=~\".*%s.*\"}[%s]))";
+    private final String MEAN_TIME_TO_RESTORE_BY_APP_DATA = "sdp:time_to_restore:by_issue{app=~\".*%s.*\"}[%s]";
     private final String CHANGE_FAILURE_RATE = "(count by (app) (count_over_time(failure_creation_timestamp{app!=\"unknown\"}[%1$s]) or sdp:lead_time:by_app * 0) / count_over_time(sdp:lead_time:by_app [%1$s]))";
     private final String CHANGE_FAILURE_RATE_BY_APP = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s])) or sdp:lead_time:by_app * 0) / sum(count_over_time(sdp:lead_time:by_app{app=~\".*%1$s.*\"} [%2$s]))";
 
@@ -140,6 +142,20 @@ public class SoftwareDeliveryPerformanceApi {
         HTTPQueryResult results = queryService.runQuery(String.format(MEAN_TIME_TO_RESTORE_BY_APP, app, range));
         return new MeanTimeToRestore(results.data().result().get(0).value().value());
     }
+
+    @GET
+    @Path("/mean_time_to_restore/{app}/data")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<MeanTimeToRestoreData> queryLeadMeanTimeToRestoreDataByApp(String app, @QueryParam("range") String range) {
+        HTTPQueryResult results = queryService.runQuery(String.format(MEAN_TIME_TO_RESTORE_BY_APP_DATA, app, range));
+        List<MeanTimeToRestoreData> mttrData= new ArrayList<MeanTimeToRestoreData>();
+        for (QueryResult qr: results.data().result()) {
+            MeanTimeToRestoreData data = new MeanTimeToRestoreData(qr.metric().issue_number, qr.values().get(0).value());
+            mttrData.add(data);
+        }
+        return mttrData;
+    }
+
 
     @GET
     @Path("/change_failure_rate/{app}")
