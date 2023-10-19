@@ -12,6 +12,7 @@ quarkus.rest-client.prometheus-api.scope=jakarta.inject.Singleton
 quarkus.rest-client.logging.scope=request-response
 quarkus.rest-client.logging.body-limit=1024
 quarkus.log.category."org.jboss.resteasy.reactive.client.logging".level=DEBUG
+quarkus.log.category.key.level=FATAL
 
 quarkus.tls.trust-all=true
 bearer.token.path=${AUTH_TOKEN}
