@@ -41,11 +41,13 @@ public class SoftwareDeliveryPerformanceApi {
         """;
     private final String LEAD_TIME_FOR_CHANGE = "avg_over_time(sdp:lead_time:global [%s])";
     private final String LEAD_TIME_FOR_CHANGE_BY_APP = "avg_over_time(sdp:lead_time:by_app{app=~'.*%s.*'}[%s])";
+    private final String LEAD_TIME_FOR_CHANGE_BY_APP_OFFSET = "avg_over_time(sdp:lead_time:by_app{app=~'.*%1$s.*'}[%2$s] offset %2$s)";
     // It should be this, once https://github.com/dora-metrics/pelorus/issues/1088 gets resolved
     private final String LEAD_TIME_FOR_CHANGE_BY_APP_DATA = "sdp:lead_time:by_commit{app=~'.*%s.*'}[%s]";
     // private final String LEAD_TIME_FOR_CHANGE_BY_APP_DATA = "(min_over_time(deploy_timestamp{app=~\".*%1$s.*\"}[%2$s]) - on(app,image_sha) group_left(commit) (max by (app, commit, image_sha) (max_over_time(commit_timestamp{app=~\".*%1$s.*\"}[%2$s]))))";
     private final String DEPLOYMENT_FREQUENCY = "count (count_over_time (deploy_timestamp [%s]))";
     private final String DEPLOYMENT_FREQUENCY_BY_APP = "count (count_over_time (deploy_timestamp{app=~'.*%s.*'}[%s]))";
+    private final String DEPLOYMENT_FREQUENCY_BY_APP_OFFSET = "count (count_over_time (deploy_timestamp{app=~'.*%1$s.*'}[%2$s] offset %2$s))";
     private final String DEPLOYMENT_FREQUENCY_BY_APP_DATA = "deploy_timestamp{app=~'.*%s.*'}[%s]";
     private final String MEAN_TIME_TO_RESTORE_BY_APP = "avg(avg_over_time(sdp:time_to_restore:by_app{app=~\".*%s.*\"}[%s]))";
     private final String MEAN_TIME_TO_RESTORE_BY_APP_DATA = "sdp:time_to_restore:by_issue{app=~\".*%s.*\"}[%s]";
@@ -81,7 +83,8 @@ public class SoftwareDeliveryPerformanceApi {
     @Produces(MediaType.APPLICATION_JSON)
     public LeadTime queryLeadTimeforChangeByApp(String app, @QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(LEAD_TIME_FOR_CHANGE_BY_APP, app, range));
-        return new LeadTime(results.data().result().get(0).value().value());
+        HTTPQueryResult offset = queryService.runQuery(String.format(LEAD_TIME_FOR_CHANGE_BY_APP_OFFSET, app, range));
+        return new LeadTime(results.data().result().get(0).value().value(), offset.data().result().get(0).value().value());
     }
 
     @GET
@@ -110,7 +113,8 @@ public class SoftwareDeliveryPerformanceApi {
     @Produces(MediaType.APPLICATION_JSON)
     public DeploymentFrequency queryDeploymentFrequencyByApp(String app, @QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(DEPLOYMENT_FREQUENCY_BY_APP, app, range));
-        return new DeploymentFrequency(results.data().result().get(0).value().value());
+        HTTPQueryResult offset = queryService.runQuery(String.format(DEPLOYMENT_FREQUENCY_BY_APP_OFFSET, app, range));
+        return new DeploymentFrequency(results.data().result().get(0).value().value(), offset.data().result().get(0).value().value());
     }
 
     @GET
