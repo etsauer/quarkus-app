@@ -38,6 +38,12 @@ oc rollout restart deployment/pelorus-api
 
 Create appropriate permissions for the pelorus-api deployment to talk to the Pelorus Prometheus instance.
 
+(Optional) If you're going to run Pelorus in a cluster external to your workspace (e.g. when using Developer Sandbox for Dev Spaces)
+
+```
+oc login ... (as a cluster admin)
+```
+
 It requires `get` on `namespace`
 
 ```bash
@@ -53,8 +59,8 @@ oc adm policy add-cluster-role-to-user pelorus-api <Your-DevSpaces-User>
 Run the app in a Dev Spaces terminal:
 
 ```bash
+oc login (as a developer user)
 oc whoami -t > /tmp/token
-export AUTH_TOKEN=/tmp/token
-export PELORUS_URL=https://prometheus-pelorus.pelorus.svc:9091/api/v1
-quarkus dev -Dquarkus.tls.trust-all=true -Dquarkus.http.host=0.0.0.0
+echo "export PELORUS_URL=https://prometheus-pelorus-pelorus.apps.cluster-d67lc.d67lc.sandbox3014.opentlc.com/api/v1" > /projects/custom-env.sh
+# run quarkus dev mode task
 ```
