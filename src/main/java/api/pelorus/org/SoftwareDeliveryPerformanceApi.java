@@ -84,7 +84,19 @@ public class SoftwareDeliveryPerformanceApi {
     public LeadTime queryLeadTimeforChangeByApp(String app, @QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(LEAD_TIME_FOR_CHANGE_BY_APP, app, range));
         HTTPQueryResult offset = queryService.runQuery(String.format(LEAD_TIME_FOR_CHANGE_BY_APP_OFFSET, app, range));
-        return new LeadTime(results.data().result().get(0).value().value(), offset.data().result().get(0).value().value());
+        try {
+            return new LeadTime(results.data().result().get(0).value().value(), offset.data().result().get(0).value().value());            
+        } catch (IndexOutOfBoundsException e) {
+            Double current = 0.0;
+            Double previous = 0.0;
+            if (results.data().result().size() > 0) {
+                current = results.data().result().get(0).value().value();
+            }
+            if (offset.data().result().size() > 0) {
+                previous = offset.data().result().get(0).value().value();
+            }
+            return new LeadTime(current, previous);
+        }
     }
 
     @GET
