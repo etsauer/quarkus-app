@@ -12,6 +12,9 @@ spec:
       - enabled: true
         app_name: deploytime-exporter
         exporter_type: deploytime
+        extraEnv:
+        - name: NAMESPACES
+          value: pelorus-api
       - app_name: github-failure-exporter
         exporter_type: failure
         env_from_secrets:

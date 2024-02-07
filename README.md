@@ -13,6 +13,7 @@ oc apply -f pelorus.yaml
 ## Deploy the application
 
 ```
+oc create namespace pelorus-api
 oc apply -f kubernetes.yaml
 oc adm policy add-cluster-role-to-user cluster-reader system:serviceaccount:pelorus-api:default
 ```
