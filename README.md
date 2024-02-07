@@ -13,6 +13,7 @@ oc apply -f pelorus.yaml
 ## Deploy the application
 
 ```
+oc create namespace pelorus-api
 oc apply -f kubernetes.yaml
 oc adm policy add-cluster-role-to-user cluster-reader system:serviceaccount:pelorus-api:default
 ```
@@ -31,7 +32,7 @@ podman push quay.io/etsauer/quarkus-app:1.0.0-SNAPSHOT
 ```
 
 ```
-oc rollout restart deployment/pelorus-api
+oc rollout restart deployment/pelorus-api -n pelorus-api
 ```
 
 ## Dev Spaces live dev mode
