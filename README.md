@@ -32,7 +32,7 @@ podman push quay.io/etsauer/quarkus-app:1.0.0-SNAPSHOT
 ```
 
 ```
-oc rollout restart deployment/pelorus-api
+oc rollout restart deployment/pelorus-api -n pelorus-api
 ```
 
 ## Dev Spaces live dev mode

@@ -50,9 +50,11 @@ public class SoftwareDeliveryPerformanceApi {
     private final String DEPLOYMENT_FREQUENCY_BY_APP_OFFSET = "count (count_over_time (deploy_timestamp{app=~'.*%1$s.*'}[%2$s] offset %2$s))";
     private final String DEPLOYMENT_FREQUENCY_BY_APP_DATA = "deploy_timestamp{app=~'.*%s.*'}[%s]";
     private final String MEAN_TIME_TO_RESTORE_BY_APP = "avg(avg_over_time(sdp:time_to_restore:by_app{app=~\".*%s.*\"}[%s]))";
+    private final String MEAN_TIME_TO_RESTORE_BY_APP_OFFSET = "avg(avg_over_time(sdp:time_to_restore:by_app{app=~\".*%1$s.*\"}[%2$s] offset %2$s))";
     private final String MEAN_TIME_TO_RESTORE_BY_APP_DATA = "sdp:time_to_restore:by_issue{app=~\".*%s.*\"}[%s]";
     private final String CHANGE_FAILURE_RATE = "(count by (app) (count_over_time(failure_creation_timestamp{app!=\"unknown\"}[%1$s]) or sdp:lead_time:by_app * 0) / count_over_time(sdp:lead_time:by_app [%1$s]))";
     private final String CHANGE_FAILURE_RATE_BY_APP = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s])) or sdp:lead_time:by_app * 0) / sum(count_over_time(sdp:lead_time:by_app{app=~\".*%1$s.*\"} [%2$s]))";
+    private final String CHANGE_FAILURE_RATE_BY_APP_OFFSET = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s] offset %2$s)) or sdp:lead_time:by_app * 0) / sum(count_over_time(sdp:lead_time:by_app{app=~\".*%1$s.*\"} [%2$s] offset %2$s))";
 
     @RestClient
     QueryService queryService;
@@ -168,7 +170,20 @@ public class SoftwareDeliveryPerformanceApi {
     @Produces(MediaType.APPLICATION_JSON)
     public MeanTimeToRestore queryMeanTimeToRestoreByApp(String app, @QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(MEAN_TIME_TO_RESTORE_BY_APP, app, range));
-        return new MeanTimeToRestore(results.data().result().get(0).value().value());
+        HTTPQueryResult offset = queryService.runQuery(String.format(MEAN_TIME_TO_RESTORE_BY_APP_OFFSET, app, range));
+        try{
+            return new MeanTimeToRestore(results.data().result().get(0).value().value(),offset.data().result().get(0).value().value());
+        } catch (IndexOutOfBoundsException e) {
+            Double current = 0.0;
+            Double previous = 0.0;
+            if (results.data().result().size() > 0) {
+                current = results.data().result().get(0).value().value();
+            }
+            if (offset.data().result().size() > 0) {
+                previous = offset.data().result().get(0).value().value();
+            }
+            return new MeanTimeToRestore(current, previous);
+        }
     }
 
     @GET
@@ -190,7 +205,20 @@ public class SoftwareDeliveryPerformanceApi {
     @Produces(MediaType.APPLICATION_JSON)
     public ChangeFailureRate queryChangeFailureRateByApp(String app, @QueryParam("range") String range) {
         HTTPQueryResult results = queryService.runQuery(String.format(CHANGE_FAILURE_RATE_BY_APP, app, range));
-        return new ChangeFailureRate(results.data().result().get(0).value().value());
+        HTTPQueryResult offset = queryService.runQuery(String.format(CHANGE_FAILURE_RATE_BY_APP_OFFSET, app, range));
+        try {
+            return new ChangeFailureRate(results.data().result().get(0).value().value(),offset.data().result().get(0).value().value());
+        } catch (IndexOutOfBoundsException e) {
+            Double current = 0.0;
+            Double previous = 0.0;
+            if (results.data().result().size() > 0) {
+                current = results.data().result().get(0).value().value();
+            }
+            if (offset.data().result().size() > 0) {
+                previous = offset.data().result().get(0).value().value();
+            }
+            return new ChangeFailureRate(current, previous);
+        }
     }
 
     @GET
