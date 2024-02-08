@@ -16,6 +16,8 @@ quarkus:
         level: DEBUG
       key:
         level: FATAL
+      api.pelorus.org.SoftwareDeliveryPerformanceApi:
+        level: DEBUG
   rest-client:
     prometheus-api:
       url: ${PELORUS_URL}
