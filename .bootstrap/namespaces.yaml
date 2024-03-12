@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devspaces-operator
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devspaces
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pelorus

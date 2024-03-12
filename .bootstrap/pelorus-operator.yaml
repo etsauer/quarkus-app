@@ -1,0 +1,21 @@
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: pelorus
+  namespace: pelorus
+spec:
+  targetNamespaces:
+  - pelorus
+---
+kind: Subscription
+apiVersion: operators.coreos.com/v1alpha1
+metadata:
+  name: pelorus-operator
+  namespace: pelorus
+spec:
+  channel: alpha
+  installPlanApproval: Automatic
+  name: pelorus-operator
+  source: community-operators
+  sourceNamespace: openshift-marketplace
