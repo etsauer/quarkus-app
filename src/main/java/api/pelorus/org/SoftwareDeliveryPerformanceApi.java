@@ -323,7 +323,7 @@ public class SoftwareDeliveryPerformanceApi {
         List<MeanTimeToRestoreData> mttrData = new ArrayList<MeanTimeToRestoreData>();
         for (QueryResult qr : results.data().result()) {
             MeanTimeToRestoreData data = new MeanTimeToRestoreData(qr.metric().issue_number,
-                    qr.values().get(0).value());
+                    qr.values().get(0).value(), qr.values().get(0).timestamp());
             mttrData.add(data);
         }
         return mttrData;
