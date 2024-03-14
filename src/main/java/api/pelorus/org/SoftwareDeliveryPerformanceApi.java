@@ -132,8 +132,8 @@ public class SoftwareDeliveryPerformanceApi {
 
     private static class ChangeFailureRateQuery {
         static final String CHANGE_FAILURE_RATE = "(count by (app) (count_over_time(failure_creation_timestamp{app!=\"unknown\"}[%1$s] @ %2$s) or sdp:lead_time:by_app @ %2$s * 0) / count_over_time(sdp:lead_time:by_app [%1$s] @ %2$s))";
-        static final String BY_APP = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s] @ %3$s)) or sdp:lead_time:by_app @ %3$s * 0) / sum(count_over_time(sdp:lead_time:by_app{app=~\".*%1$s.*\"} [%2$s] @ %3$s))";
-        static final String BY_APP_OFFSET = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s] @ %3$s offset %2$s)) or sdp:lead_time:by_app @ %3$s * 0) / sum(count_over_time(sdp:lead_time:by_app{app=~\".*%1$s.*\"} [%2$s] @ %3$s offset %2$s))";
+        static final String BY_APP = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s] @ %3$s)) or sdp:lead_time:by_app @ %3$s * 0) / count(count_over_time(sdp:lead_time:by_commit{app=~\".*%1$s.*\"} [%2$s] @ %3$s))";
+        static final String BY_APP_OFFSET = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s] @ %3$s offset %2$s)) or sdp:lead_time:by_app @ %3$s * 0) / count(count_over_time(sdp:lead_time:by_commit{app=~\".*%1$s.*\"} [%2$s] @ %3$s offset %2$s))";
 
         static String general(RangeAt args) {
             return CHANGE_FAILURE_RATE.formatted(args.range, args.at);
