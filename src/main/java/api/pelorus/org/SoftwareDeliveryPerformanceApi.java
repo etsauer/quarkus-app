@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.prometheus.api.App;
 import io.prometheus.api.ChangeFailureRate;
+import io.prometheus.api.ChangeFailureRateData;
 import io.prometheus.api.DeploymentFrequency;
 import io.prometheus.api.DeploymentFrequencyData;
 import io.prometheus.api.HTTPQueryResult;
@@ -134,6 +135,7 @@ public class SoftwareDeliveryPerformanceApi {
         static final String CHANGE_FAILURE_RATE = "(count by (app) (count_over_time(failure_creation_timestamp{app!=\"unknown\"}[%1$s] @ %2$s) or sdp:lead_time:by_app @ %2$s * 0) / count_over_time(sdp:lead_time:by_app [%1$s] @ %2$s))";
         static final String BY_APP = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s] @ %3$s)) or sdp:lead_time:by_app @ %3$s * 0) / count(count_over_time(sdp:lead_time:by_commit{app=~\".*%1$s.*\"} [%2$s] @ %3$s))";
         static final String BY_APP_OFFSET = "(count(count_over_time(failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s] @ %3$s offset %2$s)) or sdp:lead_time:by_app @ %3$s * 0) / count(count_over_time(sdp:lead_time:by_commit{app=~\".*%1$s.*\"} [%2$s] @ %3$s offset %2$s))";
+        static final String BY_APP_DATA = "failure_creation_timestamp{app=~\".*%1$s.*\"}[%2$s] @ %3$s";
 
         static String general(RangeAt args) {
             return CHANGE_FAILURE_RATE.formatted(args.range, args.at);
@@ -145,6 +147,10 @@ public class SoftwareDeliveryPerformanceApi {
 
         static String byAppOfsset(AppRangeAt args) {
             return BY_APP_OFFSET.formatted(args.app, args.range, args.at);
+        }
+
+        static String byAppData(AppRangeAt args) {
+            return BY_APP_DATA.formatted(args.app, args.range, args.at);
         }
     }
 
@@ -316,7 +322,7 @@ public class SoftwareDeliveryPerformanceApi {
     @GET
     @Path("/mean_time_to_restore/{app}/data")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<MeanTimeToRestoreData> queryLeadMeanTimeToRestoreDataByApp(String app,
+    public List<MeanTimeToRestoreData> queryMeanTimeToRestoreDataByApp(String app,
             @QueryParam("range") String range, @QueryParam("start") String start) {
         HTTPQueryResult results = logAndQuery("MEAN_TIME_TO_RESTORE_BY_APP_DATA",
                 MeanTimeToRestoreQuery.byAppData(AppRangeAt.builder().app(app).range(range).at(start).build()));
@@ -354,6 +360,22 @@ public class SoftwareDeliveryPerformanceApi {
             }
             return new ChangeFailureRate(current, previous);
         }
+    }
+
+    @GET
+    @Path("/change_failure_rate/{app}/data")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<ChangeFailureRateData> queryChangeFailureRateDataByApp(String app,
+            @QueryParam("range") String range, @QueryParam("start") String start) {
+        HTTPQueryResult results = logAndQuery("CHANGE_FAILURE_RATE_BY_APP_DATA",
+                ChangeFailureRateQuery.byAppData(AppRangeAt.builder().app(app).range(range).at(start).build()));
+        List<ChangeFailureRateData> cfrData = new ArrayList<ChangeFailureRateData>();
+        for (QueryResult qr : results.data().result()) {
+            ChangeFailureRateData data = new ChangeFailureRateData(qr.metric().issue_number,
+                    qr.values().get(0).timestamp());
+            cfrData.add(data);
+        }
+        return cfrData;
     }
 
     @GET
