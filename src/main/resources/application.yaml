@@ -7,6 +7,13 @@ quarkus:
       headers: "Content-Type, Accept, X-Requested-With, remember-me"
       access-control-max-age: "3600"
       access-control-allow-credentials: true
+  langchain4j:
+    openai:
+      chat-model:
+        temperature: 0.5
+        timeout: 60s
+        model-name: gpt-3.5-turbo-1106
+        response-format: json_object
   log:
     level: "INFO"
     console:

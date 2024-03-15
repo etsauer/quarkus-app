@@ -12,9 +12,10 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
-    <quarkus.platform.version>3.4.1</quarkus.platform.version>
+    <quarkus.platform.version>3.6.9</quarkus.platform.version>
     <skipITs>true</skipITs>
     <surefire-plugin.version>3.1.2</surefire-plugin.version>
+    <quarkus.langchain4j.version>0.9.1</quarkus.langchain4j.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -80,6 +81,29 @@
         <groupId>javax.validation</groupId>
         <artifactId>validation-api</artifactId>
         <version>2.0.1.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkiverse.langchain4j</groupId>
+      <artifactId>quarkus-langchain4j-openai</artifactId>
+      <version>${quarkus.langchain4j.version}</version>
+    </dependency>
+    <!-- UI -->
+    <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>importmap</artifactId>
+        <version>1.0.8</version>
+    </dependency>
+    <dependency>
+        <groupId>org.mvnpm.at.mvnpm</groupId>
+        <artifactId>vaadin-webcomponents</artifactId>
+        <version>24.3.8</version>
+        <scope>runtime</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.mvnpm</groupId>
+        <artifactId>es-module-shims</artifactId>
+        <scope>runtime</scope>
+        <version>1.8.2</version>
     </dependency>
   </dependencies>
   <build>

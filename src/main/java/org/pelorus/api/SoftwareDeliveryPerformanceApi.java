@@ -1,4 +1,4 @@
-package api.pelorus.org;
+package org.pelorus.api;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -29,6 +29,7 @@ import io.prometheus.api.MeanTimeToRestore;
 import io.prometheus.api.MeanTimeToRestoreData;
 import io.prometheus.api.QueryResult;
 import io.prometheus.api.QueryService;
+import io.prometheus.api.SoftwareDeliveryPerformanceReport;
 import io.prometheus.api.Value;
 
 import lombok.Builder;
@@ -175,6 +176,23 @@ public class SoftwareDeliveryPerformanceApi {
             list.add(app);
         }
         return list;
+    }
+
+    @GET
+    @Path("/report/{app}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public SoftwareDeliveryPerformanceReport querySDPReportByApp(String app, @QueryParam("range") String range,
+    @QueryParam("start") String start) {
+        LeadTime lt = queryLeadTimeforChangeByApp(app, range, start);
+        List<LeadTimeData> ltd = queryLeadTimeforChangeDataByApp(app, range, start);
+        DeploymentFrequency df = queryDeploymentFrequencyByApp(app, range, start);
+        List<DeploymentFrequencyData> dfd = queryDeploymentFrequencyDataByApp(app, range, start);
+        MeanTimeToRestore mttr = queryMeanTimeToRestoreByApp(app, range, start);
+        List<MeanTimeToRestoreData> mttrd = queryMeanTimeToRestoreDataByApp(app, range, start);
+        ChangeFailureRate cfr = queryChangeFailureRateByApp(app, range, start);
+        List<ChangeFailureRateData> cfrd = queryChangeFailureRateDataByApp(app, range, start);
+
+        return new SoftwareDeliveryPerformanceReport(lt, ltd, df, dfd, mttr, mttrd, cfr, cfrd);
     }
 
     @GET
