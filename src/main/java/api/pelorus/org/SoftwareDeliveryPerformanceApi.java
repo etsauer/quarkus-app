@@ -36,6 +36,7 @@ import lombok.Builder;
 @Path("/sdp")
 public class SoftwareDeliveryPerformanceApi {
 
+    // This section defines all of the prometheus queries used to pull data from the back end
     private final String APPS_LIST = """
             group(
                 count_over_time(commit_timestamp [%1$s]) or
