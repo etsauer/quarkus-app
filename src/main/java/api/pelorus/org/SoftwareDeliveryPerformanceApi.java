@@ -222,7 +222,7 @@ public class SoftwareDeliveryPerformanceApi {
                 LeadTimeForChangeQuery.byAppData(AppRangeAt.builder().app(app).range(range).at(start).build()));
         List<LeadTimeData> leadTimeData = new ArrayList<LeadTimeData>();
         for (QueryResult qr : results.data().result()) {
-            LeadTimeData data = new LeadTimeData(qr.metric().commit, qr.metric().image_sha,
+            LeadTimeData data = new LeadTimeData(qr.metric().commit, qr.metric().commit_link, qr.metric().image_sha,
                     qr.values().get(0).timestamp(), qr.values().get(0).value());
             leadTimeData.add(data);
         }
