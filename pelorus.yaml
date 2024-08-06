@@ -3,7 +3,7 @@ apiVersion: charts.pelorus.dora-metrics.io/v1alpha1
 kind: Pelorus
 metadata:
   name: pelorus-sample
-  namespace: pelorus
+  namespace: test-pelorus-operator
 spec:
   federate_openshift_monitoring:
     enabled: false
@@ -13,19 +13,8 @@ spec:
         app_name: deploytime-exporter
         exporter_type: deploytime
         extraEnv:
-        - name: NAMESPACES
-          value: pelorus-api
-      - app_name: github-failure-exporter
-        exporter_type: failure
-        env_from_secrets:
-        - github-pat
-        extraEnv:
-          - name: PROVIDER
-            value: github
-          - name: PROJECTS
-            value: etsauer/pelorus-api
-          - name: GITHUB_ISSUE_LABEL
-            value: enhancement
+        - name: LOG_LEVEL
+          value: DEBUG
       - enabled: true
         app_name: committime-exporter
         exporter_type: committime
@@ -33,8 +22,11 @@ spec:
         - name: PROVIDER
           value: containerimage
       - enabled: true
-        app_name: webhook-exporter
-        exporter_type: webhook
+        app_name: committime-exporter-git
+        exporter_type: committime
+        extraEnv:
+        - name: PROVIDER
+          value: git
     global: {}
   openshift_prometheus_basic_auth_pass: changeme
   openshift_prometheus_htpasswd_auth: 'internal:{SHA}+pvrmeQCmtWmYVOZ57uuITVghrM='
