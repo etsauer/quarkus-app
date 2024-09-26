@@ -8,6 +8,7 @@
     ```
 1. Create a GitHub Oauth App for OpenShift login, and export the client id and secret to your environment.
     ```bash
+    export GITHUB_OAUTH_OPENSHIFT=<client id>
     export GITHUB_OAUTH_OPENSHIFT=<client secret>
     ```
 1. Apply configs to install Dev Spaces and Pelorus
@@ -17,7 +18,7 @@ oc apply -f .bootstrap/devspaces-operator.yaml
 envsubst < .bootstrap/github-oauth-openshift.yaml | oc apply -f -
 envsubst < .bootstrap/github-oauth.yaml | oc apply -f -
 envsubst < .bootstrap/github-pat-secret.yaml | oc apply -f -
-oc apply -f .bootstrap/identity-provider.yaml
+envsubst < .bootstrap/identity-provider.yaml | oc apply -f -
 oc apply -f .bootstrap/devspaces.yaml
 oc apply -f .bootstrap/pelorus-operator.yaml
 oc apply -f pelorus.yaml

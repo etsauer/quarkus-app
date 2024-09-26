@@ -8,7 +8,7 @@ spec:
     mappingMethod: claim 
     type: GitHub
     github:
-      clientID: 06670858f23f6fc4aabe
+      clientID: ${GITHUB_OAUTH_OPENSHIFT_ID}
       clientSecret: 
         name: github-oauth
       organizations: 
