@@ -23,7 +23,7 @@ spec:
           - name: PROVIDER
             value: github
           - name: PROJECTS
-            value: etsauer/pelorus-api
+            value: dora-metrics/pelorus-api
           - name: GITHUB_ISSUE_LABEL
             value: enhancement
       - enabled: true
