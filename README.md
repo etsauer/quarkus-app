@@ -22,7 +22,7 @@ oc adm policy add-cluster-role-to-user cluster-reader system:serviceaccount:pelo
 The application can be packaged using:
 
 ```
-./mvnw package -Dnative -Dquarkus.native.container-build=true -Dcommit.id="$(git rev-parse HEAD)" -Dcommit.date="$(git log -1 --format='%ad' --date='format:%a %b %d %H:%M:%S %Y %z')" -Dorigin.url="$(git config --get remote.origin.url)" -Dmaven.test.skip
+./mvnw package -Dquarkus.container-build=true -Dcommit.id="$(git rev-parse HEAD)" -Dcommit.date="$(git log -1 --format='%ad' --date='format:%a %b %d %H:%M:%S %Y %z')" -Dorigin.url="$(git config --get remote.origin.url)" -Dmaven.test.skip
 ```
 
 The build also produces a container image tagged with the snapshot version. In order to deploy the image, re-tag it for your repository, and then push it to a registry:
